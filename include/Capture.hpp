@@ -7,9 +7,11 @@
 #include <map>
 #include <vector>
 
-const int DIM = 500;
+#include "enVRConsts.hpp"
 
-std::map<std::string, cv::Mat> capture_images();
-void save_frames(std::vector<cv::Mat>);
+namespace enVR {
+	std::map<std::string, cv::Mat> capture_images();
+	void save_frames(std::vector<cv::Mat>);
+}
 
 #endif
