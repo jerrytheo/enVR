@@ -14,12 +14,11 @@ IFLAGS = -I./include
 CVINC = `pkg-config --cflags opencv`
 CFLAGS = $(IFLAGS) -c
 
-# Object files.
-OBJS = lib/*.o
-INCS = include/*.hpp
-
 # Header for Constants.
-CONSTS = inc/enVRConsts.hpp
+CONSTS = include/enVRConsts.hpp
+
+# Object files.
+OBJS = lib/Capture.o lib/Generate.o lib/Viewer.o
 
 enVR : src/main.cpp $(OBJS)
 	$(CC) $(XFLAGS) src/main.cpp $(LFLAGS) $(IFLAGS) -o enVR 
