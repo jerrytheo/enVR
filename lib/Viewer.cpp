@@ -12,7 +12,7 @@ static void keyboard_handler(unsigned char, int, int);
 static point_set pts;
 static GLdouble theta[] = {0.0, 0.0, 0.0};
 
-void init_viewer(int* argc, char** argv)
+void enVR::init_viewer(int* argc, char** argv)
 {
 	glutInit(argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
@@ -24,7 +24,7 @@ void init_viewer(int* argc, char** argv)
 	init();
 }
 
-void view_3d_image(point_set pset)
+void enVR::view_3d_image(point_set pset)
 {
 	std::copy(pset.begin(), pset.end(), std::inserter(pts, pts.end()));
 	glutMainLoop();

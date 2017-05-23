@@ -31,7 +31,7 @@ static point_set extrapolate_top  (cv::Mat tframe, double lthresh,
  *    point_set := A set of points that form the projection for the
  *      corresponding face.
  */
-point_set extrapolate_projection(cv::Mat frame, std::string face,
+point_set enVR::extrapolate_projection(cv::Mat frame, std::string face,
 										double lthresh, double uthresh)
 {
 	point_set pts;
@@ -41,6 +41,46 @@ point_set extrapolate_projection(cv::Mat frame, std::string face,
 	else if (face == "right") pts = extrapolate_right(frame, lthresh, uthresh);
 	else if (face == "top")   pts = extrapolate_top  (frame, lthresh, uthresh);
 	return pts;
+}
+
+
+/*
+ *  construct_3d_image - Returns a set of vertices that when drawn
+ *  using OpenGL form a 3D representation of the original projections.
+ *
+ *  Parameters:
+ *    point_map pmap := A map that associates each face with a set of
+ *      points.
+ *
+ *  Returns:
+ *    point_set := A set of points to be drawn in OpenGL.    
+ */
+point_set enVR::construct_3d_image(point_map pmap)
+{
+	point_set inter, inter2;
+
+	// Intersection of front and left.
+	std::set_intersection(pmap["front"].begin(), pmap["front"].end(),
+						  pmap["left"].begin(), pmap["left"].end(),
+						  std::inserter(inter, inter.end()));
+
+	// Intersection of inter and back.
+	std::set_intersection(inter.begin(), inter.end(),
+						  pmap["back"].begin(), pmap["back"].end(),
+						  std::inserter(inter2, inter2.end()));
+	
+	inter.clear();
+	// Intersection of inter and right.
+	std::set_intersection(inter2.begin(), inter2.end(),
+						  pmap["right"].begin(), pmap["right"].end(),
+						  std::inserter(inter, inter.end()));
+	inter2.clear();
+	// Intersection of inter and top.
+	std::set_intersection(inter.begin(), inter.end(),
+						  pmap["top"].begin(), pmap["top"].end(),
+						  std::inserter(inter2, inter2.end()));
+
+	return inter2;
 }
 
 
@@ -156,44 +196,4 @@ static point_set extrapolate_top(cv::Mat fframe, double lthresh,
 		}
 	}
 	return pts;
-}
-
-
-/*
- *  construct_3d_image - Returns a set of vertices that when drawn
- *  using OpenGL form a 3D representation of the original projections.
- *
- *  Parameters:
- *    point_map pmap := A map that associates each face with a set of
- *      points.
- *
- *  Returns:
- *    point_set := A set of points to be drawn in OpenGL.    
- */
-point_set construct_3d_image(point_map pmap)
-{
-	point_set inter, inter2;
-
-	// Intersection of front and left.
-	std::set_intersection(pmap["front"].begin(), pmap["front"].end(),
-						  pmap["left"].begin(), pmap["left"].end(),
-						  std::inserter(inter, inter.end()));
-
-	// Intersection of inter and back.
-	std::set_intersection(inter.begin(), inter.end(),
-						  pmap["back"].begin(), pmap["back"].end(),
-						  std::inserter(inter2, inter2.end()));
-	
-	inter.clear();
-	// Intersection of inter and right.
-	std::set_intersection(inter2.begin(), inter2.end(),
-						  pmap["right"].begin(), pmap["right"].end(),
-						  std::inserter(inter, inter.end()));
-	inter2.clear();
-	// Intersection of inter and top.
-	std::set_intersection(inter.begin(), inter.end(),
-						  pmap["top"].begin(), pmap["top"].end(),
-						  std::inserter(inter2, inter2.end()));
-
-	return inter2;
 }

@@ -16,7 +16,7 @@ using namespace enVR;
  *     the captured image.
  */
 
-frame_map capture_images()
+frame_map enVR::capture_images()
 {
 	using std::string;
 	frame_map frames;
@@ -52,7 +52,7 @@ frame_map capture_images()
  * Returns:
  *   None
  */
-void save_frames(frame_map frames)
+void enVR::save_frames(frame_map frames)
 {
 	for (auto it = frames.begin(); it != frames.end(); ++it)
 		cv::imwrite("img/" + it->first + ".jpg", it->second);
@@ -66,7 +66,7 @@ void save_frames(frame_map frames)
  *   frame_map frames := Each entry is the cube
  *     face and it's corresponding frame.
  */
-frame_map read_frames()
+frame_map enVR::read_frames()
 {
 	frame_map frames;
 	std::vector<std::string> cams {"front", "left", "right", "back", "top"};
