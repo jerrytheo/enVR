@@ -14,7 +14,9 @@ int main(int argc, char* argv[])
 	using std::endl;
 	using std::cin;
 
-	unsigned char choice;
+	uint count_cameras();
+
+	unsigned char choice = 'n';
 
 	cout << endl;
 	
@@ -29,9 +31,12 @@ int main(int argc, char* argv[])
 	
 	cout << endl;
 	
-	cout << "Cameras attached: 6" << endl;
-	cout << ":: Proceed to capture images? [y/n] ";
-	cin  >> choice;
+	uint cams = count_cameras();
+	cout << "Cameras attached: " << cams << endl;
+	if (cams >= 6) {
+		cout << ":: Proceed to capture images? [y/n] ";
+		cin  >> choice;
+	}
 
 	cout.setf(std::ios::unitbuf);
 
@@ -68,4 +73,19 @@ int main(int argc, char* argv[])
 
 	cout << ":: Reached target: Viewer." << endl;
 	enVR::view_3d_image(img3d);
+}
+
+/* count_cameras - Count the number of cameras attached. */
+uint count_cameras()
+{
+	cv::VideoCapture temp_camera;
+	uint maxTested = 10;
+	for (uint i = 0; i < maxTested; i++) {
+		cv::VideoCapture temp_camera(i);
+		bool res = (!temp_camera.isOpened());
+		temp_camera.release();
+		if (res)
+			return i;
+	}
+	return maxTested;
 }
