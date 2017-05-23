@@ -10,7 +10,7 @@ _Need to write later._
 
 ### Instructions:
 ```
-$ git clone https://gitlab.com/jerrytheo96/enVR
+$ git clone https://gitlab.com/jerrytheo96/enVR.git
 $ cd enVR
 $ make
 $ ./enVR
