@@ -1,14 +1,20 @@
 #include "Generate.hpp"
+#include <GL/gl.h>
 
 using namespace enVR;
 
 // Declarations for this file.
 
-static point_set extrapolate_front(cv::Mat fframe);
-static point_set extrapolate_left (cv::Mat lframe);
-static point_set extrapolate_back (cv::Mat bframe);
-static point_set extrapolate_right(cv::Mat rframe);
-static point_set extrapolate_top  (cv::Mat tframe);
+static point_set extrapolate_front(cv::Mat fframe, double lthresh,
+								   double uthresh);
+static point_set extrapolate_left (cv::Mat lframe, double lthresh,
+								   double uthresh);
+static point_set extrapolate_back (cv::Mat bframe, double lthresh,
+								   double uthresh);
+static point_set extrapolate_right(cv::Mat rframe, double lthresh,
+								   double uthresh);
+static point_set extrapolate_top  (cv::Mat tframe, double lthresh,
+								   double uthresh);
 
 
 /*
@@ -43,21 +49,21 @@ static point_set extrapolate_front(cv::Mat fframe, double lthresh,
 										  double uthresh)
 {
 	point_set pts;
-	for (int i=0; i < DIM; ++i) {
-		for (int j=0; j < DIM; ++j) {
+	for (uint i=0; i < dim; ++i) {
+		for (uint j=0; j < dim; ++j) {
 			GLfloat pixel = fframe.at<GLfloat>(i, j);
 			if (pixel > lthresh && pixel < uthresh) {
-				for (int k=0; k < DIM; ++k) {
+				for (uint k=0; k < dim; ++k) {
 					points pt;
 					pt[0] = j;
-					pt[1] = DIM - i - 1;
+					pt[1] = dim - i - 1;
 					pt[2] = k;
-					gen_pts.insert(pt);
+					pts.insert(pt);
 				}
 			}
 		}
 	}
-	return gen_pts;
+	return pts;
 }
 
 
@@ -66,21 +72,21 @@ static point_set extrapolate_left(cv::Mat fframe, double lthresh,
 										 double uthresh)
 {
 	point_set pts;
-	for (int i=0; i < DIM; ++i) {
-		for (int j=0; j < DIM; ++j) {
+	for (uint i=0; i < dim; ++i) {
+		for (uint j=0; j < dim; ++j) {
 			GLfloat pixel = fframe.at<GLfloat>(i, j);
 			if (pixel > lthresh && pixel < uthresh) {
-				for (int k=0; k < DIM; ++k) {
+				for (uint k=0; k < dim; ++k) {
 					points pt;
 					pt[0] = k;
-					pt[1] = DIM - i - 1;
+					pt[1] = dim - i - 1;
 					pt[2] = j;
-					gen_pts.insert(pt);
+					pts.insert(pt);
 				}
 			}
 		}
 	}
-	return gen_pts;
+	return pts;
 }
 
 
@@ -89,21 +95,21 @@ static point_set extrapolate_back(cv::Mat fframe, double lthresh,
 										 double uthresh)
 {
 	point_set pts;
-	for (int i=0; i < DIM; ++i) {
-		for (int j=0; j < DIM; ++j) {
+	for (uint i=0; i < dim; ++i) {
+		for (uint j=0; j < dim; ++j) {
 			GLfloat pixel = fframe.at<GLfloat>(i, j);
 			if (pixel > lthresh && pixel < uthresh) {
-				for (int k=0; k < DIM; ++k) {
+				for (uint k=0; k < dim; ++k) {
 					points pt;
-					pt[0] = DIM - j - 1;
-					pt[1] = DIM - i - 1;
+					pt[0] = dim - j - 1;
+					pt[1] = dim - i - 1;
 					pt[2] = k;
-					gen_pts.insert(pt);
+					pts.insert(pt);
 				}
 			}
 		}
 	}
-	return gen_pts;
+	return pts;
 }
 
 
@@ -112,21 +118,21 @@ static point_set extrapolate_right(cv::Mat fframe, double lthresh,
 										  double uthresh)
 {
 	point_set pts;
-	for (int i=0; i < DIM; ++i) {
-		for (int j=0; j < DIM; ++j) {
+	for (uint i=0; i < dim; ++i) {
+		for (uint j=0; j < dim; ++j) {
 			GLfloat pixel = fframe.at<GLfloat>(i, j);
 			if (pixel > lthresh && pixel < uthresh) {
-				for (int k=0; k < DIM; ++k) {
+				for (uint k=0; k < dim; ++k) {
 					points pt;
 					pt[0] = k;
-					pt[1] = DIM - i - 1;
-					pt[2] = DIM - j - 1;
-					gen_pts.insert(pt);
+					pt[1] = dim - i - 1;
+					pt[2] = dim - j - 1;
+					pts.insert(pt);
 				}
 			}
 		}
 	}
-	return gen_pts;
+	return pts;
 }
 
 
@@ -135,21 +141,21 @@ static point_set extrapolate_top(cv::Mat fframe, double lthresh,
 										double uthresh)
 {
 	point_set pts;
-	for (int i=0; i < DIM; ++i) {
-		for (int j=0; j < DIM; ++j) {
+	for (uint i=0; i < dim; ++i) {
+		for (uint j=0; j < dim; ++j) {
 			GLfloat pixel = fframe.at<GLfloat>(i, j);
 			if (pixel > lthresh && pixel < uthresh) {
-				for (int k=0; k < DIM; ++k) {
+				for (uint k=0; k < dim; ++k) {
 					points pt;
 					pt[0] = j;
 					pt[1] = k;
 					pt[2] = i;
-					gen_pts.insert(pt);
+					pts.insert(pt);
 				}
 			}
 		}
 	}
-	return gen_pts;
+	return pts;
 }
 
 
@@ -166,28 +172,28 @@ static point_set extrapolate_top(cv::Mat fframe, double lthresh,
  */
 point_set construct_3d_image(point_map pmap)
 {
-	point_set inter;
+	point_set inter, inter2;
 
 	// Intersection of front and left.
 	std::set_intersection(pmap["front"].begin(), pmap["front"].end(),
 						  pmap["left"].begin(), pmap["left"].end(),
-						  std::back_inserter(inter));
+						  std::inserter(inter, inter.end()));
 
 	// Intersection of inter and back.
 	std::set_intersection(inter.begin(), inter.end(),
 						  pmap["back"].begin(), pmap["back"].end(),
-						  std::back_inserter(inter));
-
+						  std::inserter(inter2, inter2.end()));
+	
+	inter.clear();
 	// Intersection of inter and right.
-	std::set_intersection(inter.begin(),
-						  inter.end(),
-						  pmap["right"].begin(),
-						  pmap["right"].end(),
-						  std::back_inserter(inter));
-
+	std::set_intersection(inter2.begin(), inter2.end(),
+						  pmap["right"].begin(), pmap["right"].end(),
+						  std::inserter(inter, inter.end()));
+	inter2.clear();
+	// Intersection of inter and top.
 	std::set_intersection(inter.begin(), inter.end(),
 						  pmap["top"].begin(), pmap["top"].end(),
-						  std::back_inserter(inter));
+						  std::inserter(inter2, inter2.end()));
 
-	return inter;
+	return inter2;
 }

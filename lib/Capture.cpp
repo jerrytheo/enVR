@@ -1,4 +1,5 @@
 #include "Capture.hpp"
+#include <iostream>
 
 using namespace enVR;
 
@@ -18,20 +19,20 @@ using namespace enVR;
 frame_map capture_images()
 {
 	using std::string;
-	std::map<string, cv::Mat> frames;
+	frame_map frames;
 	std::vector<string> cams {"front", "left", "right", "back",  "top"};
 
 	// For unit buffering.
 	std::cout.setf(std::ios::unitbuf);
 	
 	cv::Mat frame;
-	for (int i=0; i < cams.size(); i++) {
+	for (uint i=0; i < cams.size(); i++) {
 		std::cout << ":: Capturing image from camera " << i << " ... ";
 		cv::VideoCapture cap(i+1);
-		cap.set(CV_CAP_PROP_FRAME_WIDTH, DIM);
-		cap.set(CV_CAP_PROP_FRAME_HEIGHT, DIM);
+		cap.set(CV_CAP_PROP_FRAME_WIDTH, dim);
+		cap.set(CV_CAP_PROP_FRAME_HEIGHT, dim);
 		cap >> frame;
-		frames[cams[i] = frame.clone();
+		frames[cams[i]] = frame.clone();
 		std::cout << "done." << std::endl;
 	}
 
@@ -68,8 +69,10 @@ void save_frames(frame_map frames)
 frame_map read_frames()
 {
 	frame_map frames;
-	std::vector<string> cams {"front", "left", "right", "back", "top"};	
+	std::vector<std::string> cams {"front", "left", "right", "back", "top"};
 	for (auto it = cams.begin(); it != cams.end(); ++it) {
 		cv::Mat frame = cv::imread("img/" + (*it) + ".jpg");
+		frames[(*it)] = frame.clone();
 	}
+	return frames;
 }

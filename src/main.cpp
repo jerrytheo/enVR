@@ -6,6 +6,10 @@
 
 int main(int argc, char* argv[])
 {
+	using std::cout;
+	using std::endl;
+	using std::cin;
+
 	unsigned char choice;
 
 	cout << endl;
@@ -23,8 +27,8 @@ int main(int argc, char* argv[])
 	
 	cout << "Cameras attached: 6" << endl;
 	cout << ":: Proceed to capture images? [y/n] ";
-	cin  >> ch;
-	if (ch == 'y') {
+	cin  >> choice;
+	if (choice == 'y') {
 		cout << ":: Ignoring camera 1." << endl;
 		cout << ":: Beginning captures." << endl;
 		auto frames = enVR::capture_images();

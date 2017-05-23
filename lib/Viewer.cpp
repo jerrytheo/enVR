@@ -7,14 +7,14 @@ using namespace enVR;
 
 static void display();
 static void init();
-static void keyboard_handler();
+static void keyboard_handler(unsigned char, int, int);
 
 static point_set pts;
 static GLdouble theta[] = {0.0, 0.0, 0.0};
 
 void init_viewer(int* argc, char** argv)
 {
-	glutInit(&argc, argv);
+	glutInit(argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard_handler);
@@ -26,7 +26,7 @@ void init_viewer(int* argc, char** argv)
 
 void view_3d_image(point_set pset)
 {
-	std::copy(pset.begin(), pset.end(), std::back_inserter(pts));
+	std::copy(pset.begin(), pset.end(), std::inserter(pts, pts.end()));
 	glutMainLoop();
 }
 
@@ -53,7 +53,7 @@ static void display()
 
 	glBegin(GL_POINTS);
 	for (auto it = pts.begin(); it != pts.end(); ++it) {
-		glVertex3f((*it)[0], (*it)[1], (*it)[2])
+		glVertex3f((*it)[0], (*it)[1], (*it)[2]);
 	}
 	glEnd();
 
