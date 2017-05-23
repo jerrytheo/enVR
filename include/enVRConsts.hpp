@@ -1,6 +1,7 @@
 #ifndef _ENVR_CONSTANTS
 #define _ENVR_CONSTANTS
 
+#include <vector>
 #include <array>
 #include <set>
 #include <map>
@@ -11,6 +12,8 @@
 
 namespace enVR {
 	const int dim = 500;
+	const std::vector<std::string> faces {"front", "left", "back", "right",
+										  "top"};
 
 	/* typedefs for long types. */
 	typedef std::array<GLfloat, 3> points;
