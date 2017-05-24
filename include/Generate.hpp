@@ -5,7 +5,7 @@
 
 namespace enVR {
 	point_set extrapolate_projection(cv::Mat, std::string,
-									double, double);
+									 uchar, uchar, uchar);
 	point_set construct_3d_image(point_map);
 }
 

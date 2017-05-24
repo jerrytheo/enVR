@@ -35,5 +35,5 @@ lib/Generate.o : lib/Generate.cpp include/Generate.hpp $(CONSTS)
 lib/Viewer.o : lib/Viewer.cpp include/Viewer.hpp $(CONSTS)
 	$(CC) $(CFLAGS) lib/Viewer.cpp -o lib/Viewer.o
 
-#clean:
-#	rm -f $(OBJS) enVR
+clean:
+	rm -f $(OBJS) enVR

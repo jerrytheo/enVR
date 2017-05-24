@@ -4,9 +4,11 @@
 #include "Viewer.hpp"
 
 #include <iostream>
+#include <limits>
 
-const double lthresh = -1e100;
-const double uthresh =  1e100;
+const uchar rthresh = 200;
+const uchar gthresh = 200;
+const uchar bthresh = 200;
 
 int main(int argc, char* argv[])
 {
@@ -45,7 +47,6 @@ int main(int argc, char* argv[])
 		cout << ":: Ignoring camera 1." << endl;
 		cout << ":: Capturing images." << endl;
 		frames = enVR::capture_images();
-		cout << ":: Captures complete." << endl;
 		cout << ":: Saving frames to img ... ";
 		enVR::save_frames(frames);
 		cout << "done." << endl;
@@ -55,13 +56,14 @@ int main(int argc, char* argv[])
 		cout << "done." << endl;
 	}
 
-	cout << ":: Extrapolating projections to 3 dimensions ... ";
+	cout << ":: Extrapolating projections." << endl;
 	enVR::point_map pmap;
 	for (auto it = enVR::faces.begin(); it != enVR::faces.end(); ++it) {
+		cout << "    => Extrapolating " << *it << " ... ";
 		pmap[(*it)] = enVR::extrapolate_projection(frames[(*it)], (*it),
-												   lthresh, uthresh);
+												   rthresh, gthresh, bthresh);
+		cout << "done." << endl;
 	}
-	cout << "done." << endl;
 
 	cout << ":: Constructing 3D image ... ";
 	enVR::point_set img3d = enVR::construct_3d_image(pmap);

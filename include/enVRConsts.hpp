@@ -11,7 +11,7 @@
 
 
 namespace enVR {
-	const int dim = 500;
+	const int dim = 200;
 	const std::vector<std::string> faces {"front", "left", "back", "right",
 										  "top"};
 

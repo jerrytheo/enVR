@@ -5,16 +5,11 @@ using namespace enVR;
 
 // Declarations for this file.
 
-static point_set extrapolate_front(cv::Mat fframe, double lthresh,
-								   double uthresh);
-static point_set extrapolate_left (cv::Mat lframe, double lthresh,
-								   double uthresh);
-static point_set extrapolate_back (cv::Mat bframe, double lthresh,
-								   double uthresh);
-static point_set extrapolate_right(cv::Mat rframe, double lthresh,
-								   double uthresh);
-static point_set extrapolate_top  (cv::Mat tframe, double lthresh,
-								   double uthresh);
+static point_set extrapolate_front(cv::Mat, uchar, uchar, uchar);
+static point_set extrapolate_left (cv::Mat, uchar, uchar, uchar);
+static point_set extrapolate_back (cv::Mat, uchar, uchar, uchar);
+static point_set extrapolate_right(cv::Mat, uchar, uchar, uchar);
+static point_set extrapolate_top  (cv::Mat, uchar, uchar, uchar);
 
 
 /*
@@ -24,22 +19,24 @@ static point_set extrapolate_top  (cv::Mat tframe, double lthresh,
  * Parameters:
  *   cv::Mat frame := The frame to extrapolate.
  *   std::string face := The face to extrapolate for.
- *   double lthresh := The lower end threshold.
- *   double uthresh := The upper end threshold.
+ *   uchar rthresh := The red color threshold.
+ *   uchar gthresh := The green color threshold.
+ *   uchar bthresh := The blue color threshold.
  *
  *  Returns:
  *    point_set := A set of points that form the projection for the
  *      corresponding face.
  */
 point_set enVR::extrapolate_projection(cv::Mat frame, std::string face,
-										double lthresh, double uthresh)
+										uchar rthresh, uchar gthresh,
+										uchar bthresh)
 {
 	point_set pts;
-	if      (face == "front") pts = extrapolate_front(frame, lthresh, uthresh);
-	else if (face == "left")  pts = extrapolate_left (frame, lthresh, uthresh);
-	else if (face == "back")  pts = extrapolate_back (frame, lthresh, uthresh);
-	else if (face == "right") pts = extrapolate_right(frame, lthresh, uthresh);
-	else if (face == "top")   pts = extrapolate_top  (frame, lthresh, uthresh);
+	if      (face == "front") pts = extrapolate_front(frame, rthresh, gthresh, bthresh);
+	else if (face == "left")  pts = extrapolate_left (frame, rthresh, gthresh, bthresh);
+	else if (face == "back")  pts = extrapolate_back (frame, rthresh, gthresh, bthresh);
+	else if (face == "right") pts = extrapolate_right(frame, rthresh, gthresh, bthresh);
+	else if (face == "top")   pts = extrapolate_top  (frame, rthresh, gthresh, bthresh);
 	return pts;
 }
 
@@ -85,14 +82,17 @@ point_set enVR::construct_3d_image(point_map pmap)
 
 
 /* Extrapolate the front face. */
-static point_set extrapolate_front(cv::Mat fframe, double lthresh,
-										  double uthresh)
+static point_set extrapolate_front(cv::Mat frame, uchar rthresh,
+								  uchar gthresh, uchar bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
+		uchar* p = frame.ptr(i);
 		for (uint j=0; j < dim; ++j) {
-			GLfloat pixel = fframe.at<GLfloat>(i, j);
-			if (pixel > lthresh && pixel < uthresh) {
+			uchar green = *p++;
+			uchar blue  = *p++;
+			uchar red   = *p++;
+			if (red < rthresh && green < gthresh && blue < bthresh) {
 				for (uint k=0; k < dim; ++k) {
 					points pt;
 					pt[0] = j;
@@ -108,14 +108,17 @@ static point_set extrapolate_front(cv::Mat fframe, double lthresh,
 
 
 /* Extrapolate the left face. */
-static point_set extrapolate_left(cv::Mat fframe, double lthresh,
-										 double uthresh)
+static point_set extrapolate_left(cv::Mat frame, uchar rthresh,
+								  uchar gthresh, uchar bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
+		uchar* p = frame.ptr(i);
 		for (uint j=0; j < dim; ++j) {
-			GLfloat pixel = fframe.at<GLfloat>(i, j);
-			if (pixel > lthresh && pixel < uthresh) {
+			uchar green = *p++;
+			uchar blue  = *p++;
+			uchar red   = *p++;
+			if (red < rthresh && green < gthresh && blue < bthresh) {
 				for (uint k=0; k < dim; ++k) {
 					points pt;
 					pt[0] = k;
@@ -131,14 +134,17 @@ static point_set extrapolate_left(cv::Mat fframe, double lthresh,
 
 
 /* Extrapolate the back face. */
-static point_set extrapolate_back(cv::Mat fframe, double lthresh,
-										 double uthresh)
+static point_set extrapolate_back(cv::Mat frame, uchar rthresh,
+								  uchar gthresh, uchar bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
+		uchar* p = frame.ptr(i);
 		for (uint j=0; j < dim; ++j) {
-			GLfloat pixel = fframe.at<GLfloat>(i, j);
-			if (pixel > lthresh && pixel < uthresh) {
+			uchar green = *p++;
+			uchar blue  = *p++;
+			uchar red   = *p++;
+			if (red < rthresh && green < gthresh && blue < bthresh) {
 				for (uint k=0; k < dim; ++k) {
 					points pt;
 					pt[0] = dim - j - 1;
@@ -154,14 +160,17 @@ static point_set extrapolate_back(cv::Mat fframe, double lthresh,
 
 
 /* Extrapolate the right face. */
-static point_set extrapolate_right(cv::Mat fframe, double lthresh,
-										  double uthresh)
+static point_set extrapolate_right(cv::Mat frame, uchar rthresh,
+								  uchar gthresh, uchar bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
+		uchar* p = frame.ptr(i);
 		for (uint j=0; j < dim; ++j) {
-			GLfloat pixel = fframe.at<GLfloat>(i, j);
-			if (pixel > lthresh && pixel < uthresh) {
+			uchar green = *p++;
+			uchar blue  = *p++;
+			uchar red   = *p++;
+			if (red < rthresh && green < gthresh && blue < bthresh) {
 				for (uint k=0; k < dim; ++k) {
 					points pt;
 					pt[0] = k;
@@ -177,14 +186,17 @@ static point_set extrapolate_right(cv::Mat fframe, double lthresh,
 
 
 /* Extrapolate the top face. */
-static point_set extrapolate_top(cv::Mat fframe, double lthresh,
-										double uthresh)
+static point_set extrapolate_top(cv::Mat frame, uchar rthresh,
+								  uchar gthresh, uchar bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
+		uchar* p = frame.ptr(i);
 		for (uint j=0; j < dim; ++j) {
-			GLfloat pixel = fframe.at<GLfloat>(i, j);
-			if (pixel > lthresh && pixel < uthresh) {
+			uchar green = *p++;
+			uchar blue  = *p++;
+			uchar red   = *p++;
+			if (red < rthresh && green < gthresh && blue < bthresh) {
 				for (uint k=0; k < dim; ++k) {
 					points pt;
 					pt[0] = j;
