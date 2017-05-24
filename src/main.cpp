@@ -1,3 +1,25 @@
+/*
+ * main.cpp - Main function for enVR.
+ * 
+ * Copyright (C) 2017  Abhijit J. Theophilus, Abhishek S. V.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * For the complete license, see LICENSE.md.
+ *
+ */
+
 #include "enVRConsts.hpp"
 #include "Capture.hpp"
 #include "Generate.hpp"
@@ -21,18 +43,25 @@ int main(int argc, char* argv[])
 	unsigned char choice = 'n';
 
 	cout << endl;
-	
+
+	cout << "enVR  Copyright (C) 2017  Abhijit J. Theophilus, Abhishek S. V." << endl;
+	cout << "This program comes with ABSOLUTELY NO WARRANTY; This is free software," << endl;
+    cout << "and you are welcome to redistribute it under certain conditions." << endl;
+	cout << "For the complete license, see LICENSE.md." << endl;
+
+	cout << endl;
+
 	cout << "Welcome to enVR" << endl;
 	cout << "---------------" << endl;
 	
 	cout << endl;
 
-	cout << "Developed by:" << endl;
+	cout << "Author information:" << endl;
 	cout << "  Abhijit J. Theophilus  (abhitheo96@gmail.com)" << endl;
 	cout << "  Abhishek Surbhat       (abhishek.surbhat@gmail.com)" << endl;
 	
 	cout << endl;
-	
+
 	uint cams = count_cameras();
 	cout << "Cameras attached: " << cams << endl;
 	if (cams >= 6) {

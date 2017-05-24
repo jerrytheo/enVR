@@ -17,7 +17,7 @@ CFLAGS = -Wall $(IFLAGS) -c
 CONSTS = include/enVRConsts.hpp
 
 # Object files.
-OBJS = src/main.o lib/Capture.o lib/Generate.o lib/Viewer.o
+OBJS = src/main.o src/Capture.o src/Generate.o src/Viewer.o
 INCS = include/Capture.hpp include/Generate.hpp include/Viewer.hpp
 
 enVR : $(OBJS)
@@ -26,14 +26,14 @@ enVR : $(OBJS)
 src/main.o : src/main.cpp $(INCS)
 	$(CC) $(CFLAGS) src/main.cpp -o src/main.o
 
-lib/Capture.o : lib/Capture.cpp include/Capture.hpp $(CONSTS)
-	$(CC) $(CFLAGS) $(CVINC) lib/Capture.cpp -o lib/Capture.o
+src/Capture.o : src/Capture.cpp include/Capture.hpp $(CONSTS)
+	$(CC) $(CFLAGS) $(CVINC) src/Capture.cpp -o src/Capture.o
 
-lib/Generate.o : lib/Generate.cpp include/Generate.hpp $(CONSTS)
-	$(CC) $(CFLAGS) $(CVINC) lib/Generate.cpp -o lib/Generate.o
+src/Generate.o : src/Generate.cpp include/Generate.hpp $(CONSTS)
+	$(CC) $(CFLAGS) $(CVINC) src/Generate.cpp -o src/Generate.o
 
-lib/Viewer.o : lib/Viewer.cpp include/Viewer.hpp $(CONSTS)
-	$(CC) $(CFLAGS) lib/Viewer.cpp -o lib/Viewer.o
+src/Viewer.o : src/Viewer.cpp include/Viewer.hpp $(CONSTS)
+	$(CC) $(CFLAGS) src/Viewer.cpp -o src/Viewer.o
 
 clean:
 	rm -f $(OBJS) enVR

@@ -1,3 +1,26 @@
+/*
+ * Generate.cpp - Functions that construct the 3D image from the 2D
+ * projections stored as OpenCV matrices.
+ * 
+ * Copyright (C) 2017  Abhijit J. Theophilus, Abhishek S. V.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * For the complete license, see LICENSE.md.
+ *
+ */
+
 #include "Generate.hpp"
 #include <GL/gl.h>
 
@@ -5,11 +28,11 @@ using namespace enVR;
 
 // Declarations for this file.
 
-static point_set extrapolate_front(cv::Mat, uchar, uchar, uchar);
-static point_set extrapolate_left (cv::Mat, uchar, uchar, uchar);
-static point_set extrapolate_back (cv::Mat, uchar, uchar, uchar);
-static point_set extrapolate_right(cv::Mat, uchar, uchar, uchar);
-static point_set extrapolate_top  (cv::Mat, uchar, uchar, uchar);
+static point_set extrapolate_front(const cv::Mat&, uchar, uchar, uchar);
+static point_set extrapolate_left (const cv::Mat&, uchar, uchar, uchar);
+static point_set extrapolate_back (const cv::Mat&, uchar, uchar, uchar);
+static point_set extrapolate_right(const cv::Mat&, uchar, uchar, uchar);
+static point_set extrapolate_top  (const cv::Mat&, uchar, uchar, uchar);
 
 
 /*
@@ -17,7 +40,7 @@ static point_set extrapolate_top  (cv::Mat, uchar, uchar, uchar);
  * uthresh. Extrapolates the rest of the frame to create a 3D image.
  *
  * Parameters:
- *   cv::Mat frame := The frame to extrapolate.
+ *   const cv::Mat& frame := The frame to extrapolate.
  *   std::string face := The face to extrapolate for.
  *   uchar rthresh := The red color threshold.
  *   uchar gthresh := The green color threshold.
@@ -27,9 +50,9 @@ static point_set extrapolate_top  (cv::Mat, uchar, uchar, uchar);
  *    point_set := A set of points that form the projection for the
  *      corresponding face.
  */
-point_set enVR::extrapolate_projection(cv::Mat frame, std::string face,
-										uchar rthresh, uchar gthresh,
-										uchar bthresh)
+point_set enVR::extrapolate_projection(const cv::Mat& frame, std::string face,
+									   uchar rthresh, uchar gthresh,
+									   uchar bthresh)
 {
 	point_set pts;
 	if      (face == "front") pts = extrapolate_front(frame, rthresh, gthresh, bthresh);
@@ -52,7 +75,7 @@ point_set enVR::extrapolate_projection(cv::Mat frame, std::string face,
  *  Returns:
  *    point_set := A set of points to be drawn in OpenGL.    
  */
-point_set enVR::construct_3d_image(point_map pmap)
+point_set enVR::construct_3d_image(point_map& pmap)
 {
 	point_set inter, inter2;
 
@@ -82,12 +105,12 @@ point_set enVR::construct_3d_image(point_map pmap)
 
 
 /* Extrapolate the front face. */
-static point_set extrapolate_front(cv::Mat frame, uchar rthresh,
+static point_set extrapolate_front(const cv::Mat& frame, uchar rthresh,
 								  uchar gthresh, uchar bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
-		uchar* p = frame.ptr(i);
+		const uchar* p = frame.ptr(i);
 		for (uint j=0; j < dim; ++j) {
 			uchar green = *p++;
 			uchar blue  = *p++;
@@ -108,12 +131,12 @@ static point_set extrapolate_front(cv::Mat frame, uchar rthresh,
 
 
 /* Extrapolate the left face. */
-static point_set extrapolate_left(cv::Mat frame, uchar rthresh,
+static point_set extrapolate_left(const cv::Mat& frame, uchar rthresh,
 								  uchar gthresh, uchar bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
-		uchar* p = frame.ptr(i);
+		const uchar* p = frame.ptr(i);
 		for (uint j=0; j < dim; ++j) {
 			uchar green = *p++;
 			uchar blue  = *p++;
@@ -134,12 +157,12 @@ static point_set extrapolate_left(cv::Mat frame, uchar rthresh,
 
 
 /* Extrapolate the back face. */
-static point_set extrapolate_back(cv::Mat frame, uchar rthresh,
+static point_set extrapolate_back(const cv::Mat& frame, uchar rthresh,
 								  uchar gthresh, uchar bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
-		uchar* p = frame.ptr(i);
+		const uchar* p = frame.ptr(i);
 		for (uint j=0; j < dim; ++j) {
 			uchar green = *p++;
 			uchar blue  = *p++;
@@ -160,12 +183,12 @@ static point_set extrapolate_back(cv::Mat frame, uchar rthresh,
 
 
 /* Extrapolate the right face. */
-static point_set extrapolate_right(cv::Mat frame, uchar rthresh,
+static point_set extrapolate_right(const cv::Mat& frame, uchar rthresh,
 								  uchar gthresh, uchar bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
-		uchar* p = frame.ptr(i);
+		const uchar* p = frame.ptr(i);
 		for (uint j=0; j < dim; ++j) {
 			uchar green = *p++;
 			uchar blue  = *p++;
@@ -186,12 +209,12 @@ static point_set extrapolate_right(cv::Mat frame, uchar rthresh,
 
 
 /* Extrapolate the top face. */
-static point_set extrapolate_top(cv::Mat frame, uchar rthresh,
+static point_set extrapolate_top(const cv::Mat& frame, uchar rthresh,
 								  uchar gthresh, uchar bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
-		uchar* p = frame.ptr(i);
+		const uchar* p = frame.ptr(i);
 		for (uint j=0; j < dim; ++j) {
 			uchar green = *p++;
 			uchar blue  = *p++;

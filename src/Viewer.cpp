@@ -1,3 +1,25 @@
+/*
+ * Viewer.cpp - Functions to construct the viewer for the 3D mdoel.
+ * 
+ * Copyright (C) 2017  Abhijit J. Theophilus, Abhishek S. V.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * For the complete license, see LICENSE.md.
+ *
+ */
+
 #include <algorithm>
 #include "Viewer.hpp"
 
@@ -12,6 +34,17 @@ static void keyboard_handler(unsigned char, int, int);
 static point_set pts;
 static GLdouble theta[] = {0.0, 0.0, 0.0};
 
+
+/*
+ * init_viewer - Initializes the viewer by initializing GLUT.
+ *
+ * Parameters:
+ *   int* argc := Command line arguments count.
+ *   char** argv := Command line arguments.
+ *
+ * Returns:
+ *   None.
+ */
 void enVR::init_viewer(int* argc, char** argv)
 {
 	glutInit(argc, argv);
@@ -24,11 +57,22 @@ void enVR::init_viewer(int* argc, char** argv)
 	init();
 }
 
-void enVR::view_3d_image(point_set pset)
+
+/*
+ * view_3d_image - Display the 3d model.
+ *
+ * Parameters:
+ *   point_set pset := The set of points that form the 3D model.
+ *
+ * Returns:
+ *   None.
+ */
+void enVR::view_3d_image(const point_set& pset)
 {
 	std::copy(pset.begin(), pset.end(), std::inserter(pts, pts.end()));
 	glutMainLoop();
 }
+
 
 static void init()
 {
@@ -41,6 +85,7 @@ static void init()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
+
 
 static void display()
 {
@@ -71,6 +116,7 @@ static void display()
 	glFlush();
 	glutSwapBuffers();
 }
+
 
 static void keyboard_handler(unsigned char key, int x, int y)
 {
