@@ -28,9 +28,9 @@
 #include <iostream>
 #include <limits>
 
-const uchar rthresh = 200;
-const uchar gthresh = 200;
-const uchar bthresh = 200;
+const uchar rthresh[] = {0, 200};
+const uchar gthresh[] = {0, 200};
+const uchar bthresh[] = {0, 200};
 
 int main(int argc, char* argv[])
 {

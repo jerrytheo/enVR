@@ -28,11 +28,16 @@ using namespace enVR;
 
 // Declarations for this file.
 
-static point_set extrapolate_front(const cv::Mat&, uchar, uchar, uchar);
-static point_set extrapolate_left (const cv::Mat&, uchar, uchar, uchar);
-static point_set extrapolate_back (const cv::Mat&, uchar, uchar, uchar);
-static point_set extrapolate_right(const cv::Mat&, uchar, uchar, uchar);
-static point_set extrapolate_top  (const cv::Mat&, uchar, uchar, uchar);
+static point_set extrapolate_front(const cv::Mat&, const uchar*,
+								   const uchar*, const uchar*);
+static point_set extrapolate_left (const cv::Mat&, const uchar*,
+								   const uchar*, const uchar*);
+static point_set extrapolate_back (const cv::Mat&, const uchar*,
+								   const uchar*, const uchar*);
+static point_set extrapolate_right(const cv::Mat&, const uchar*,
+								   const uchar*, const uchar*);
+static point_set extrapolate_top  (const cv::Mat&, const uchar*,
+								   const uchar*, const uchar*);
 
 
 /*
@@ -42,17 +47,19 @@ static point_set extrapolate_top  (const cv::Mat&, uchar, uchar, uchar);
  * Parameters:
  *   const cv::Mat& frame := The frame to extrapolate.
  *   std::string face := The face to extrapolate for.
- *   uchar rthresh := The red color threshold.
- *   uchar gthresh := The green color threshold.
- *   uchar bthresh := The blue color threshold.
+ *   const uchar* rthresh := The red color threshold.
+ *   const uchar* gthresh := The green color threshold.
+ *   const uchar* bthresh := The blue color threshold.
  *
  *  Returns:
  *    point_set := A set of points that form the projection for the
  *      corresponding face.
  */
-point_set enVR::extrapolate_projection(const cv::Mat& frame, std::string face,
-									   uchar rthresh, uchar gthresh,
-									   uchar bthresh)
+point_set enVR::extrapolate_projection(const cv::Mat& frame,
+									   std::string face,
+									   const uchar* rthresh,
+									   const uchar* gthresh,
+									   const uchar* bthresh)
 {
 	point_set pts;
 	if      (face == "front") pts = extrapolate_front(frame, rthresh, gthresh, bthresh);
@@ -105,8 +112,8 @@ point_set enVR::construct_3d_image(point_map& pmap)
 
 
 /* Extrapolate the front face. */
-static point_set extrapolate_front(const cv::Mat& frame, uchar rthresh,
-								  uchar gthresh, uchar bthresh)
+static point_set extrapolate_front(const cv::Mat& frame, const uchar* rthresh,
+								   const uchar* gthresh, const uchar* bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
@@ -115,15 +122,16 @@ static point_set extrapolate_front(const cv::Mat& frame, uchar rthresh,
 			uchar green = *p++;
 			uchar blue  = *p++;
 			uchar red   = *p++;
-			if (red < rthresh && green < gthresh && blue < bthresh) {
-				for (uint k=0; k < dim; ++k) {
-					points pt;
-					pt[0] = j;
-					pt[1] = dim - i - 1;
-					pt[2] = k;
-					pts.insert(pt);
-				}
-			}
+			if (red > rthresh[0] && red < rthresh[1])
+				if (green > gthresh[0] && green < gthresh[1])
+					if (blue > bthresh[0] && blue < bthresh[1])
+						for (uint k=0; k < dim; ++k) {
+							points pt;
+							pt[0] = j;
+							pt[1] = dim - i - 1;
+							pt[2] = k;
+							pts.insert(pt);
+						}
 		}
 	}
 	return pts;
@@ -131,8 +139,8 @@ static point_set extrapolate_front(const cv::Mat& frame, uchar rthresh,
 
 
 /* Extrapolate the left face. */
-static point_set extrapolate_left(const cv::Mat& frame, uchar rthresh,
-								  uchar gthresh, uchar bthresh)
+static point_set extrapolate_left(const cv::Mat& frame, const uchar* rthresh,
+								  const uchar* gthresh, const uchar* bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
@@ -141,15 +149,16 @@ static point_set extrapolate_left(const cv::Mat& frame, uchar rthresh,
 			uchar green = *p++;
 			uchar blue  = *p++;
 			uchar red   = *p++;
-			if (red < rthresh && green < gthresh && blue < bthresh) {
-				for (uint k=0; k < dim; ++k) {
-					points pt;
-					pt[0] = k;
-					pt[1] = dim - i - 1;
-					pt[2] = j;
-					pts.insert(pt);
-				}
-			}
+			if (red > rthresh[0] && red < rthresh[1])
+				if (green > gthresh[0] && green < gthresh[1])
+					if (blue > bthresh[0] && blue < bthresh[1])
+						for (uint k=0; k < dim; ++k) {
+							points pt;
+							pt[0] = k;
+							pt[1] = dim - i - 1;
+							pt[2] = j;
+							pts.insert(pt);
+						}
 		}
 	}
 	return pts;
@@ -157,8 +166,8 @@ static point_set extrapolate_left(const cv::Mat& frame, uchar rthresh,
 
 
 /* Extrapolate the back face. */
-static point_set extrapolate_back(const cv::Mat& frame, uchar rthresh,
-								  uchar gthresh, uchar bthresh)
+static point_set extrapolate_back(const cv::Mat& frame, const uchar* rthresh,
+								  const uchar* gthresh, const uchar* bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
@@ -167,15 +176,16 @@ static point_set extrapolate_back(const cv::Mat& frame, uchar rthresh,
 			uchar green = *p++;
 			uchar blue  = *p++;
 			uchar red   = *p++;
-			if (red < rthresh && green < gthresh && blue < bthresh) {
-				for (uint k=0; k < dim; ++k) {
-					points pt;
-					pt[0] = dim - j - 1;
-					pt[1] = dim - i - 1;
-					pt[2] = k;
-					pts.insert(pt);
-				}
-			}
+			if (red > rthresh[0] && red < rthresh[1])
+				if (green > gthresh[0] && green < gthresh[1])
+					if (blue > bthresh[0] && blue < bthresh[1])
+						for (uint k=0; k < dim; ++k) {
+							points pt;
+							pt[0] = dim - j - 1;
+							pt[1] = dim - i - 1;
+							pt[2] = k;
+							pts.insert(pt);
+						}
 		}
 	}
 	return pts;
@@ -183,8 +193,8 @@ static point_set extrapolate_back(const cv::Mat& frame, uchar rthresh,
 
 
 /* Extrapolate the right face. */
-static point_set extrapolate_right(const cv::Mat& frame, uchar rthresh,
-								  uchar gthresh, uchar bthresh)
+static point_set extrapolate_right(const cv::Mat& frame, const uchar* rthresh,
+								   const uchar* gthresh, const uchar* bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
@@ -193,15 +203,16 @@ static point_set extrapolate_right(const cv::Mat& frame, uchar rthresh,
 			uchar green = *p++;
 			uchar blue  = *p++;
 			uchar red   = *p++;
-			if (red < rthresh && green < gthresh && blue < bthresh) {
-				for (uint k=0; k < dim; ++k) {
-					points pt;
-					pt[0] = k;
-					pt[1] = dim - i - 1;
-					pt[2] = dim - j - 1;
-					pts.insert(pt);
-				}
-			}
+			if (red > rthresh[0] && red < rthresh[1])
+				if (green > gthresh[0] && green < gthresh[1])
+					if (blue > bthresh[0] && blue < bthresh[1])
+						for (uint k=0; k < dim; ++k) {
+							points pt;
+							pt[0] = k;
+							pt[1] = dim - i - 1;
+							pt[2] = dim - j - 1;
+							pts.insert(pt);
+						}
 		}
 	}
 	return pts;
@@ -209,8 +220,8 @@ static point_set extrapolate_right(const cv::Mat& frame, uchar rthresh,
 
 
 /* Extrapolate the top face. */
-static point_set extrapolate_top(const cv::Mat& frame, uchar rthresh,
-								  uchar gthresh, uchar bthresh)
+static point_set extrapolate_top(const cv::Mat& frame, const uchar* rthresh,
+								 const uchar* gthresh, const uchar* bthresh)
 {
 	point_set pts;
 	for (uint i=0; i < dim; ++i) {
@@ -219,15 +230,16 @@ static point_set extrapolate_top(const cv::Mat& frame, uchar rthresh,
 			uchar green = *p++;
 			uchar blue  = *p++;
 			uchar red   = *p++;
-			if (red < rthresh && green < gthresh && blue < bthresh) {
-				for (uint k=0; k < dim; ++k) {
-					points pt;
-					pt[0] = j;
-					pt[1] = k;
-					pt[2] = i;
-					pts.insert(pt);
-				}
-			}
+			if (red > rthresh[0] && red < rthresh[1])
+				if (green > gthresh[0] && green < gthresh[1])
+					if (blue > bthresh[0] && blue < bthresh[1])
+						for (uint k=0; k < dim; ++k) {
+							points pt;
+							pt[0] = j;
+							pt[1] = k;
+							pt[2] = i;
+							pts.insert(pt);
+						}
 		}
 	}
 	return pts;
